@@ -26,6 +26,7 @@ gem 'puppet-lint-unquoted_string-check'
 gem 'puppet-lint-usascii_format-check'
 gem 'puppet-lint-variable_contains_upcase'
 gem 'puppet-lint-version_comparison-check'
+gem 'puppetmodule-stdlib', '~> 4.0', '>= 4.0.2'
 gem 'simplecov'
 gem 'puppet-blacksmith', '>= 3.1.0', {"groups"=>["development"]}
 gem 'json', '~> 1.0', {"platforms"=>["ruby_19"], "groups"=>["test"]}
