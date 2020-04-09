@@ -43,7 +43,7 @@
 #
 # [*enable_admission_plugins*]
 # admission plugins that should be enabled in addition to default enabled ones. Comma-delimited list of admission plugins: AlwaysAdmit, AlwaysDeny, AlwaysPullImages, DefaultStorageClass, DefaultTolerationSeconds, DenyEscalatingExec, DenyExecOnPrivileged, EventRateLimit, ExtendedResourceToleration, ImagePolicyWebhook, Initializers, LimitPodHardAntiAffinityTopology, LimitRanger, MutatingAdmissionWebhook, NamespaceAutoProvision, NamespaceExists, NamespaceLifecycle, NodeRestriction, OwnerReferencesPermissionEnforcement, PersistentVolumeClaimResize, PersistentVolumeLabel, PodNodeSelector, PodPreset, PodSecurityPolicy, PodTolerationRestriction, Priority, ResourceQuota, SecurityContextDeny, ServiceAccount, StorageObjectInUseProtection, ValidatingAdmissionWebhook. The order of plugins in this flag does not matter.
-# 
+#
 # [*disable_admission_plugins*]
 # admission plugins that should be disabled although they are in the default enabled plugins list. Comma-delimited list of admission plugins: AlwaysAdmit, AlwaysDeny, AlwaysPullImages, DefaultStorageClass, DefaultTolerationSeconds, DenyEscalatingExec, DenyExecOnPrivileged, EventRateLimit, ExtendedResourceToleration, ImagePolicyWebhook, Initializers, LimitPodHardAntiAffinityTopology, LimitRanger, MutatingAdmissionWebhook, NamespaceAutoProvision, NamespaceExists, NamespaceLifecycle, NodeRestriction, OwnerReferencesPermissionEnforcement, PersistentVolumeClaimResize, PersistentVolumeLabel, PodNodeSelector, PodPreset, PodSecurityPolicy, PodTolerationRestriction, Priority, ResourceQuota, SecurityContextDeny, ServiceAccount, StorageObjectInUseProtection, ValidatingAdmissionWebhook. The order of plugins in this flag does not matter.
 #
@@ -329,13 +329,13 @@
 # [*requestheader_username_headers*]
 #   List of request headers to inspect for usernames. X-Remote-User is common.
 #   Default undef
-# 
+#
 # [*requestheader_extra_headers_prefix*]
 #   List of request header prefixes to inspect. X-Remote-Extra- is suggested.
 #
 # [*requestheader_group_headers*]
 #   List of request headers to inspect for groups. X-Remote-Group is suggested.
-# 
+#
 # [*runtime_config*]
 #   A set of key=value pairs that describe runtime configuration that may be passed to apiserver.
 #      apis/<groupVersion> key can be used to turn on/off specific api versions. apis/<groupVersion>/<resource> can be used to turn
@@ -437,7 +437,7 @@
 #   Turns on aggregator routing requests to endoints IP rather than cluster IP.
 #
 # [*extra_args*]
-#   Set your own 
+#   Set your own
 #   Default undef
 #
 class kubernetes::master::apiserver (
@@ -542,6 +542,8 @@ class kubernetes::master::apiserver (
   $proxy_client_cert_file                       = $kubernetes::master::params::kube_api_proxy_client_cert_file,
   $proxy_client_key_file                        = $kubernetes::master::params::kube_api_proxy_client_key_file,
   $extra_args                                   = $kubernetes::master::params::kube_api_extra_args,
+  $owner                                        = $kubernetes::master::params::kube_api_owner,
+  $group                                        = $kubernetes::master::params::kube_api_group,
 ) inherits kubernetes::master::params {
   validate_re($ensure, '^(running|stopped)$')
   validate_bool($enable)
@@ -580,6 +582,26 @@ class kubernetes::master::apiserver (
         ensure  => 'file',
         content => template("${module_name}/etc/kubernetes/apiserver.erb"),
         notify  => Service['kube-apiserver'],
+      }
+
+      if $log_dir {
+        file { $log_dir:
+          ensure => 'directory',
+          owner  => $owner,
+          group  => $group,
+          mode   => '0750',
+        } ~> Service['kube-apiserver']
+      }
+
+      if $audit_log_path {
+        $audit_log_path =~ /(.*\/)(.*)$/
+        $audit_log_dir = $1
+        file { $audit_log_dir:
+          ensure => 'directory',
+          owner  => $owner,
+          group  => $group,
+          mode   => '0750',
+        } ~> Service['kube-apiserver']
       }
 
       service { 'kube-apiserver':

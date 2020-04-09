@@ -27,6 +27,15 @@
 <% if scope['kubernetes::master::scheduler::master'] then -%>
  --master=<%= scope['kubernetes::master::scheduler::master'] -%>
 <% end -%>
+<% if @log_dir -%>
+ --log-dir=<%= scope['kubernetes::master::scheduler::log_dir'] -%>
+<% end -%>
+<% if @log_file -%>
+ --log-file=<%= scope['kubernetes::master::scheduler::log_file'] -%>
+<% end -%>
+<% unless [nil, :undefined, :undef, ''].include?(scope.lookupvar('kubernetes::master::scheduler::logtostderr')) -%>
+ --logtostderr=<%= scope['kubernetes::master::scheduler::logtostderr'] -%>
+<% end -%>
 <% if @policy_config_file then -%>
  --policy-config-file=<%= scope['kubernetes::master::scheduler::policy_config_file'] -%>
 <% end -%>

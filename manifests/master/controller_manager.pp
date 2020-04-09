@@ -38,8 +38,8 @@
 #   Deprecated
 #
 # [*bind_address*]
-#   The IP address on which to listen for the --secure-port port. 
-#   The associated interface(s) must be reachable by the rest of the cluster, and by CLI/web clients. 
+#   The IP address on which to listen for the --secure-port port.
+#   The associated interface(s) must be reachable by the rest of the cluster, and by CLI/web clients.
 #   If blank, all interfaces will be used (0.0.0.0 for all IPv4 interfaces and :: for all IPv6 interfaces).i
 #   (default 0.0.0.0)
 #
@@ -120,13 +120,13 @@
 #   Defaults to undef.
 #
 # [*controllers*]
-#   A list of controllers to enable. '*' enables all on-by-default controllers, 
+#   A list of controllers to enable. '*' enables all on-by-default controllers,
 #   'foo' enables the controller named 'foo', '-foo' disables the controller named 'foo'.
-#   All controllers: attachdetach, bootstrapsigner, clusterrole-aggregation, cronjob, 
-#   csrapproving, csrcleaner, csrsigning, daemonset, deployment, disruption, endpoint, 
-#   garbagecollector, horizontalpodautoscaling, job, namespace, nodeipam, nodelifecycle, 
-#   persistentvolume-binder, persistentvolume-expander, podgc, pv-protection, 
-#   pvc-protection, replicaset, replicationcontroller, resourcequota, route, service, 
+#   All controllers: attachdetach, bootstrapsigner, clusterrole-aggregation, cronjob,
+#   csrapproving, csrcleaner, csrsigning, daemonset, deployment, disruption, endpoint,
+#   garbagecollector, horizontalpodautoscaling, job, namespace, nodeipam, nodelifecycle,
+#   persistentvolume-binder, persistentvolume-expander, podgc, pv-protection,
+#   pvc-protection, replicaset, replicationcontroller, resourcequota, route, service,
 #   serviceaccount, serviceaccount-token, statefulset, tokencleaner, ttl
 #   Disabled-by-default controllers: bootstrapsigner, tokencleaner
 #
@@ -177,14 +177,14 @@
 #   Defaults to undef
 #
 # [*authentication_kubeconfig*]
-#   Kubeconfig file pointing at the 'core' kubernetes server with enough rights 
-#   to create tokenaccessreviews.authentication.k8s.io. This is optional. 
+#   Kubeconfig file pointing at the 'core' kubernetes server with enough rights
+#   to create tokenaccessreviews.authentication.k8s.io. This is optional.
 #   If empty, all token requests are considered to be anonymous and no client CA is looked up in the cluster.
 #   Default undef
 #
 # [*authorization_kubeconfig*]
-#   Kubeconfig file pointing at the 'core' kubernetes server with enough rights to create 
-#   subjectaccessreviews.authorization.k8s.io. 
+#   Kubeconfig file pointing at the 'core' kubernetes server with enough rights to create
+#   subjectaccessreviews.authorization.k8s.io.
 #   This is optional. If empty, all requests not skipped by authorization are forbidden.
 #   Default undef
 #
@@ -357,13 +357,13 @@
 #   Defaults to undef.
 #
 # [*horizontal_pod_autoscaler_use_rest_clients*]
-#   If set to true, causes the horizontal pod autoscaler controller to use REST clients through the kube-aggregator, 
-#      instead of using the legacy metrics client through the API server proxy.  
+#   If set to true, causes the horizontal pod autoscaler controller to use REST clients through the kube-aggregator,
+#      instead of using the legacy metrics client through the API server proxy.
 #      This is required for custom metrics support in the horizontal pod autoscaler.
 #   Defaults to undef.
 #
 # [*authorization_always_allow_paths*]
-#   A list of HTTP paths to skip during authorization, i.e. these are authorized without contacting the 'core' kubernetes server. 
+#   A list of HTTP paths to skip during authorization, i.e. these are authorized without contacting the 'core' kubernetes server.
 #   Default [/healthz]
 #
 # [*verbosity*]
@@ -418,6 +418,9 @@ class kubernetes::master::controller_manager (
   $leader_elect_lease_duration                = $kubernetes::master::params::kube_controller_leader_elect_lease_duration,
   $leader_elect_renew_deadline                = $kubernetes::master::params::kube_controller_leader_elect_renew_deadline,
   $leader_elect_retry_period                  = $kubernetes::master::params::kube_controller_leader_elect_retry_period,
+  $log_dir                                    = $kubernetes::master::params::kube_controller_log_dir,
+  $log_file                                   = $kubernetes::master::params::kube_controller_log_file,
+  $logtostderr                                = $kubernetes::master::params::kube_controller_logtostderr,
   $master                                     = $kubernetes::master::params::kube_controller_master,
   $min_resync_period                          = $kubernetes::master::params::kube_controller_min_resync_period,
   $namespace_sync_period                      = $kubernetes::master::params::kube_controller_namespace_sync_period,
@@ -453,6 +456,8 @@ class kubernetes::master::controller_manager (
   $verbosity                                  = $kubernetes::master::params::kube_controller_verbosity,
   $controllers                                = $kubernetes::master::params::kube_controller_controllers,
   $extra_args                                 = $kubernetes::master::params::kube_controller_extra_args,
+  $owner                                      = $kubernetes::master::params::kube_controller_owner,
+  $group                                      = $kubernetes::master::params::kube_controller_group,
 ) inherits kubernetes::master::params {
   validate_re($ensure, '^(running|stopped)$')
   validate_bool($enable)
@@ -489,6 +494,15 @@ class kubernetes::master::controller_manager (
         group   => 'root',
         content => template("${module_name}/etc/kubernetes/controller-manager.erb"),
         notify  => Service['kube-controller-manager'],
+      }
+
+      if $log_dir {
+        file { $log_dir:
+          ensure => 'directory',
+          owner  => $owner,
+          group  => $group,
+          mode   => '0750',
+        } ~> Service['kube-controller-manager']
       }
 
       service { 'kube-controller-manager':

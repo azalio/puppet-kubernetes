@@ -111,7 +111,7 @@
 # [*container_runtime*]
 #   The container runtime to use. Possible values: 'docker', 'rkt'. Default: 'docker'.
 #   Defaults to undef
-# 
+#
 # [*config*]
 #   The config file for kubelet.
 #
@@ -600,6 +600,9 @@ class kubernetes::node::kubelet (
   $kubelet_cgroups                                   = $kubernetes::node::params::kubelet_kubelet_cgroups,
   $lock_file                                         = $kubernetes::node::params::kubelet_lock_file,
   $low_diskspace_threshold_mb                        = $kubernetes::node::params::kubelet_low_diskspace_threshold_mb,
+  $log_dir                                           = $kubernetes::node::params::kubelet_log_dir,
+  $log_file                                          = $kubernetes::node::params::kubelet_log_file,
+  $logtostderr                                       = $kubernetes::node::params::kubelet_logtostderr,
   $make_iptables_util_chains                         = $kubernetes::node::params::kubelet_make_iptables_util_chains,
   $manifest_url                                      = $kubernetes::node::params::kubelet_manifest_url,
   $manifest_url_header                               = $kubernetes::node::params::kubelet_manifest_url_header,
@@ -645,6 +648,8 @@ class kubernetes::node::kubelet (
   $cni_bin_dir                                       = $kubernetes::node::params::kubelet_cni_bin_dir,
   $cni_conf_dir                                      = $kubernetes::node::params::kubelet_cni_conf_dir,
   $network_plugin                                    = $kubernetes::node::params::kubelet_network_plugin,
+  $owner                                             = $kubernetes::node::params::kubelet_owner,
+  $group                                             = $kubernetes::node::params::kubelet_group,
 
 ) inherits kubernetes::node::params {
   validate_re($ensure, '^(running|stopped)$')
@@ -669,26 +674,6 @@ class kubernetes::node::kubelet (
     fail('You can\'t use both of cert_dir and tls_*.')
   }
 
-  if $journald_forward_enable and $::operatingsystemmajrelease == '7' {
-    file { '/etc/systemd/system/kubelet.service.d':
-      ensure => 'directory',
-      owner  => 'root',
-      group  => 'root',
-      mode   => '0755',
-    }
-    file { '/etc/systemd/system/kubelet.service.d/journald.conf':
-      ensure  => file,
-      owner   => 'root',
-      group   => 'root',
-      mode    => '0644',
-      content => template("${module_name}/systemd/kubelet_journald.conf.erb"),
-    } ~>
-    exec { 'reload systemctl daemon for kubelet':
-      command     => '/bin/systemctl daemon-reload',
-      refreshonly => true,
-    } ~> Service['kubelet']
-  }
-
   case $::osfamily {
     'redhat' : {
     }
@@ -708,6 +693,35 @@ class kubernetes::node::kubelet (
     ensure  => 'file',
     content => template("${module_name}/etc/kubernetes/kubelet.erb"),
   } ~> Service['kubelet']
+
+  if $log_dir {
+    file { $log_dir:
+      ensure => 'directory',
+      owner  => $owner,
+      group  => $group,
+      mode   => '0750',
+    } ~> Service['kubelet']
+  }
+
+  if $journald_forward_enable and $::operatingsystemmajrelease == '7' {
+    file { '/etc/systemd/system/kubelet.service.d':
+      ensure => 'directory',
+      owner  => 'root',
+      group  => 'root',
+      mode   => '0755',
+    }
+    file { '/etc/systemd/system/kubelet.service.d/journald.conf':
+      ensure  => file,
+      owner   => 'root',
+      group   => 'root',
+      mode    => '0644',
+      content => template("${module_name}/systemd/kubelet_journald.conf.erb"),
+    } ~>
+    exec { 'reload systemctl daemon for kubelet':
+      command     => '/bin/systemctl daemon-reload',
+      refreshonly => true,
+    } ~> Service['kubelet']
+  }
 
   if $pod_manifest_path {
     file { $pod_manifest_path:

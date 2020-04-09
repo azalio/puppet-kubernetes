@@ -102,6 +102,8 @@ class kubernetes::master::params {
   $kube_api_proxy_client_cert_file = undef
   $kube_api_proxy_client_key_file = undef
   $kube_api_extra_args = ''
+  $kube_api_group = 'root'
+  $kube_api_owner = 'root'
 
   # controller manager config
   $kube_controller_service_ensure = running
@@ -147,6 +149,9 @@ class kubernetes::master::params {
   $kube_controller_leader_elect_lease_duration = '15s'
   $kube_controller_leader_elect_renew_deadline = '10s'
   $kube_controller_leader_elect_retry_period = '2s'
+  $kube_controller_log_dir = undef
+  $kube_controller_log_file = undef
+  $kube_controller_logtostderr = true
   $kube_controller_master = undef
   $kube_controller_min_resync_period = undef
   $kube_controller_namespace_sync_period = '5m0s'
@@ -183,6 +188,8 @@ class kubernetes::master::params {
   $kube_controller_verbosity = 2
   $kube_controller_controllers = '*'
   $kube_controller_extra_args = ''
+  $kube_controller_group = 'root'
+  $kube_controller_owner = 'root'
 
   # scheduler config
   $kube_scheduler_service_ensure = running
@@ -206,6 +213,9 @@ class kubernetes::master::params {
   $kube_scheduler_leader_elect_renew_deadline = '10s'
   $kube_scheduler_leader_elect_retry_period = '2s'
   $kube_scheduler_log_flush_frequency = '5s'
+  $kube_scheduler_log_dir = undef
+  $kube_scheduler_log_file = undef
+  $kube_scheduler_logtostderr = true
   $kube_scheduler_master = undef
   $kube_scheduler_policy_config_file = undef
   $kube_scheduler_port = 0
@@ -215,4 +225,6 @@ class kubernetes::master::params {
   $kube_scheduler_authorization_always_allow_paths = '/healthz'
   $kube_scheduler_verbosity = 2
   $kube_scheduler_extra_args = ''
+  $kube_scheduler_group = 'root'
+  $kube_scheduler_owner = 'root'
 }

@@ -82,6 +82,15 @@
  --leader-elect-renew-deadline=<%= scope['kubernetes::master::controller_manager::leader_elect_renew_deadline'] -%>
  --leader-elect-retry-period=<%= scope['kubernetes::master::controller_manager::leader_elect_retry_period'] -%>
 <% end -%>
+<% if @log_dir -%>
+ --log-dir=<%= scope['kubernetes::master::controller_manager::log_dir'] -%>
+<% end -%>
+<% if @log_file -%>
+ --log-file=<%= scope['kubernetes::master::controller_manager::log_file'] -%>
+<% end -%>
+<% unless [nil, :undefined, :undef, ''].include?(scope.lookupvar('kubernetes::master::controller_manager::logtostderr')) -%>
+ --logtostderr=<%= scope['kubernetes::master::controller_manager::logtostderr'] -%>
+<% end -%>
 <% if scope['kubernetes::master::controller_manager::master'] then -%>
  --master=<%= scope['kubernetes::master::controller_manager::master'] -%>
 <% end -%>

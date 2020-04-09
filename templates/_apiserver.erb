@@ -236,5 +236,9 @@
  --proxy-client-cert-file=<%= scope['kubernetes::master::apiserver::proxy_client_cert_file'] -%>
  --proxy-client-key-file=<%= scope['kubernetes::master::apiserver::proxy_client_key_file'] -%>
 <% end -%>
+<% if @use_log_dir -%>
+ --log-dir=<%= scope['kubernetes::master::apiserver::log_dir'] -%>
+ --logtostderr=<%= scope['kubernetes::master::apiserver::log_to_stderr'] -%>
+<% end -%>
  --v=<%= scope['kubernetes::master::apiserver::verbosity'] -%>
  <%= scope['kubernetes::master::apiserver::extra_args'] -%>

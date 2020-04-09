@@ -57,6 +57,15 @@
 <% if @kubeconfig -%>
  --kubeconfig=<%= scope['kubernetes::node::kube_proxy::kubeconfig'] -%>
 <% end -%>
+<% if @log_dir -%>
+ --log-dir=<%= scope['kubernetes::node::kube_proxy::log_dir'] -%>
+<% end -%>
+<% if @log_file -%>
+ --log-file=<%= scope['kubernetes::node::kube_proxy::log_file'] -%>
+<% end -%>
+<% unless [nil, :undefined, :undef, ''].include?(scope.lookupvar('kubernetes::node::kube_proxy::logtostderr')) -%>
+ --logtostderr=<%= scope['kubernetes::node::kube_proxy::logtostderr'] -%>
+<% end -%>
 <% if @masquerade_all -%>
 <% unless [nil, :undefined, :undef, ''].include?(scope.lookupvar('kubernetes::node::kube_proxy::masquerade_all')) -%>
  --masquerade-all=<%= scope['kubernetes::node::kube_proxy::masquerade_all'] -%>
