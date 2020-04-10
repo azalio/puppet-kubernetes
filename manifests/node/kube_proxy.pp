@@ -216,7 +216,7 @@ class kubernetes::node::kube_proxy (
         }
         'debian' : {
           file { '/etc/default/kube-proxy':
-            ensure  => 'file',
+            ensure  => file,
             force   => true,
             content => template("${module_name}/etc/default/proxy.erb"),
             notify  => Service['kube-proxy'],
@@ -228,14 +228,14 @@ class kubernetes::node::kube_proxy (
       }
 
       file { '/etc/kubernetes/proxy':
-        ensure  => 'file',
+        ensure  => file,
         content => template("${module_name}/etc/kubernetes/proxy.erb"),
         notify  => Service['kube-proxy'],
       }
 
       if $log_dir {
         file { $log_dir:
-          ensure => 'directory',
+          ensure => directory,
           owner  => $owner,
           group  => $group,
           mode   => '0750',
@@ -249,7 +249,7 @@ class kubernetes::node::kube_proxy (
 
       if $journald_forward_enable and $::operatingsystemmajrelease == '7' {
         file { '/etc/systemd/system/kube-proxy.service.d':
-          ensure => 'directory',
+          ensure => directory,
           owner  => 'root',
           group  => 'root',
           mode   => '0755',

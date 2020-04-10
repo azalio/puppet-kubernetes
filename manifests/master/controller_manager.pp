@@ -476,7 +476,7 @@ class kubernetes::master::controller_manager (
         }
         'debian' : {
           file { '/etc/default/kube-controller-manager':
-            ensure  => 'file',
+            ensure  => file,
             force   => true,
             content => template("${module_name}/etc/default/controller-manager.erb"),
             notify  => Service['kube-controller-manager'],
@@ -488,7 +488,7 @@ class kubernetes::master::controller_manager (
       }
 
       file { '/etc/kubernetes/controller-manager':
-        ensure  => 'file',
+        ensure  => file,
         force   => true,
         owner   => 'root',
         group   => 'root',
@@ -498,7 +498,7 @@ class kubernetes::master::controller_manager (
 
       if $log_dir {
         file { $log_dir:
-          ensure => 'directory',
+          ensure => directory,
           owner  => $owner,
           group  => $group,
           mode   => '0750',
@@ -512,7 +512,7 @@ class kubernetes::master::controller_manager (
 
       if $journald_forward_enable and $::operatingsystemmajrelease == '7' {
         file { '/etc/systemd/system/kube-controller-manager.service.d':
-          ensure => 'directory',
+          ensure => directory,
           owner  => 'root',
           group  => 'root',
           mode   => '0755',

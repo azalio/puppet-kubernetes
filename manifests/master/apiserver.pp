@@ -567,7 +567,7 @@ class kubernetes::master::apiserver (
         }
         'debian' : {
           file { '/etc/default/kube-apiserver':
-            ensure  => 'file',
+            ensure  => file,
             force   => true,
             content => template("${module_name}/etc/default/api-server.erb"),
             notify  => Service['kube-apiserver'],
@@ -579,14 +579,14 @@ class kubernetes::master::apiserver (
       }
 
       file { '/etc/kubernetes/apiserver':
-        ensure  => 'file',
+        ensure  => file,
         content => template("${module_name}/etc/kubernetes/apiserver.erb"),
         notify  => Service['kube-apiserver'],
       }
 
       if $log_dir {
         file { $log_dir:
-          ensure => 'directory',
+          ensure => directory,
           owner  => $owner,
           group  => $group,
           mode   => '0750',
@@ -597,7 +597,7 @@ class kubernetes::master::apiserver (
         $audit_log_path =~ /(.*\/)(.*)$/
         $audit_log_dir = $1
         file { $audit_log_dir:
-          ensure => 'directory',
+          ensure => directory,
           owner  => $owner,
           group  => $group,
           mode   => '0750',
@@ -611,7 +611,7 @@ class kubernetes::master::apiserver (
 
       if $journald_forward_enable and $::operatingsystemmajrelease == '7' {
         file { '/etc/systemd/system/kube-apiserver.service.d':
-          ensure => 'directory',
+          ensure => directory,
           owner  => 'root',
           group  => 'root',
           mode   => '0755',

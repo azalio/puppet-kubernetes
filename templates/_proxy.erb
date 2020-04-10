@@ -58,10 +58,10 @@
  --kubeconfig=<%= scope['kubernetes::node::kube_proxy::kubeconfig'] -%>
 <% end -%>
 <% if @log_dir -%>
- --log-dir=<%= scope['kubernetes::node::kube_proxy::log_dir'] -%>
+ --log-dir=<%= @log_dir -%>
 <% end -%>
 <% if @log_file -%>
- --log-file=<%= scope['kubernetes::node::kube_proxy::log_file'] -%>
+ --log-file=<%= @log_file -%>
 <% end -%>
 <% unless [nil, :undefined, :undef, ''].include?(scope.lookupvar('kubernetes::node::kube_proxy::logtostderr')) -%>
  --logtostderr=<%= scope['kubernetes::node::kube_proxy::logtostderr'] -%>

@@ -185,7 +185,7 @@ class kubernetes::master::scheduler (
         }
         'debian' : {
           file { '/etc/default/kube-scheduler':
-            ensure  => 'file',
+            ensure  => file,
             force   => true,
             content => template("${module_name}/etc/default/scheduler.erb"),
             notify  => Service['kube-scheduler'],
@@ -197,7 +197,7 @@ class kubernetes::master::scheduler (
       }
 
       file { '/etc/kubernetes/scheduler':
-        ensure  => 'file',
+        ensure  => file,
         force   => true,
         owner   => 'root',
         group   => 'root',
@@ -207,7 +207,7 @@ class kubernetes::master::scheduler (
 
       if $log_dir {
         file { $log_dir:
-          ensure => 'directory',
+          ensure => directory,
           owner  => $owner,
           group  => $group,
           mode   => '0750',
@@ -221,7 +221,7 @@ class kubernetes::master::scheduler (
 
       if $journald_forward_enable and $::operatingsystemmajrelease == '7' {
         file { '/etc/systemd/system/kube-scheduler.service.d':
-          ensure => 'directory',
+          ensure => directory,
           owner  => 'root',
           group  => 'root',
           mode   => '0755',

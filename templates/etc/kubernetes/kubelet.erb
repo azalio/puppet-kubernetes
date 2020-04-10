@@ -219,10 +219,10 @@ KUBELET_ARGS="<% -%>
  --low-diskspace-threshold-mb=<%= scope['kubernetes::node::kubelet::low_diskspace_threshold_mb'] -%>
 <% end -%>
 <% if @log_dir -%>
- --log-dir=<%= scope['kubernetes::node::kubelet::log_dir'] -%>
+ --log-dir=<%= @log_dir -%>
 <% end -%>
 <% if @log_file -%>
- --log-file=<%= scope['kubernetes::node::kubelet::log_file'] -%>
+ --log-file=<%= @log_file -%>
 <% end -%>
 <% unless [nil, :undefined, :undef, ''].include?(scope.lookupvar('kubernetes::node::kubelet::logtostderr')) -%>
  --logtostderr=<%= scope['kubernetes::node::kubelet::logtostderr'] -%>

@@ -679,7 +679,7 @@ class kubernetes::node::kubelet (
     }
     'debian' : {
       file { '/etc/default/kubelet':
-        ensure  => 'file',
+        ensure  => file,
         force   => true,
         content => template("${module_name}/etc/default/kubelet.erb"),
       } ~> Service['kubelet']
@@ -690,13 +690,13 @@ class kubernetes::node::kubelet (
   }
 
   file { '/etc/kubernetes/kubelet':
-    ensure  => 'file',
+    ensure  => file,
     content => template("${module_name}/etc/kubernetes/kubelet.erb"),
   } ~> Service['kubelet']
 
   if $log_dir {
     file { $log_dir:
-      ensure => 'directory',
+      ensure => directory,
       owner  => $owner,
       group  => $group,
       mode   => '0750',
@@ -705,7 +705,7 @@ class kubernetes::node::kubelet (
 
   if $journald_forward_enable and $::operatingsystemmajrelease == '7' {
     file { '/etc/systemd/system/kubelet.service.d':
-      ensure => 'directory',
+      ensure => directory,
       owner  => 'root',
       group  => 'root',
       mode   => '0755',

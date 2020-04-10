@@ -140,10 +140,10 @@
  --kubelet-timeout=<%= scope['kubernetes::master::apiserver::kubelet_timeout'] -%>
  --kubernetes-service-node-port=<%= scope['kubernetes::master::apiserver::kubernetes_service_node_port'] -%>
 <% if @log_dir -%>
- --log-dir=<%= scope['kubernetes::master::apiserver::log_dir'] -%>
+ --log-dir=<%= @log_dir -%>
 <% end -%>
 <% if @log_file -%>
- --log-file=<%= scope['kubernetes::master::apiserver::log_file'] -%>
+ --log-file=<%= @log_file -%>
 <% end -%>
 <% unless [nil, :undefined, :undef, ''].include?(scope.lookupvar('kubernetes::master::apiserver::logtostderr')) -%>
  --logtostderr=<%= scope['kubernetes::master::apiserver::logtostderr'] -%>

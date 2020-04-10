@@ -28,10 +28,10 @@
  --master=<%= scope['kubernetes::master::scheduler::master'] -%>
 <% end -%>
 <% if @log_dir -%>
- --log-dir=<%= scope['kubernetes::master::scheduler::log_dir'] -%>
+ --log-dir=<%= @log_dir -%>
 <% end -%>
 <% if @log_file -%>
- --log-file=<%= scope['kubernetes::master::scheduler::log_file'] -%>
+ --log-file=<%= @log_file -%>
 <% end -%>
 <% unless [nil, :undefined, :undef, ''].include?(scope.lookupvar('kubernetes::master::scheduler::logtostderr')) -%>
  --logtostderr=<%= scope['kubernetes::master::scheduler::logtostderr'] -%>
