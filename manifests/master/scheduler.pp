@@ -118,7 +118,7 @@
 #   Defaults to undef
 #
 # [*authorization_kubeconfig*]
-#   Kubeconfig file pointing at the 'core' kubernetes server with enough rights to create 
+#   Kubeconfig file pointing at the 'core' kubernetes server with enough rights to create
 #    subjectaccessreviews.authorization.k8s.io.
 #    This is optional. If empty, all requests not skipped by authorization are forbidden.
 #   Defaults to undef
@@ -161,6 +161,9 @@ class kubernetes::master::scheduler (
   $leader_elect_renew_deadline        = $kubernetes::master::params::kube_scheduler_leader_elect_renew_deadline,
   $leader_elect_retry_period          = $kubernetes::master::params::kube_scheduler_leader_elect_retry_period,
   $log_flush_frequency                = $kubernetes::master::params::kube_scheduler_log_flush_frequency,
+  $log_dir                            = $kubernetes::master::params::kube_scheduler_log_dir,
+  $log_file                           = $kubernetes::master::params::kube_scheduler_log_file,
+  $logtostderr                        = $kubernetes::master::params::kube_scheduler_logtostderr,
   $master                             = $kubernetes::master::params::kube_scheduler_master,
   $policy_config_file                 = $kubernetes::master::params::kube_scheduler_policy_config_file,
   $port                               = $kubernetes::master::params::kube_scheduler_port,
@@ -171,6 +174,8 @@ class kubernetes::master::scheduler (
   $authorization_always_allow_paths   = $kubernetes::master::params::kube_scheduler_authorization_always_allow_paths,
   $verbosity                          = $kubernetes::master::params::kube_scheduler_verbosity,
   $extra_args                         = $kubernetes::master::params::kube_scheduler_extra_args,
+  $owner                              = $kubernetes::master::params::kube_scheduler_owner,
+  $group                              = $kubernetes::master::params::kube_scheduler_group,
 ) inherits kubernetes::master::params {
   validate_re($ensure, '^(running|stopped)$')
   validate_bool($enable)
@@ -185,7 +190,7 @@ class kubernetes::master::scheduler (
         }
         'debian' : {
           file { '/etc/default/kube-scheduler':
-            ensure  => 'file',
+            ensure  => file,
             force   => true,
             content => template("${module_name}/etc/default/scheduler.erb"),
             notify  => Service['kube-scheduler'],
@@ -197,12 +202,21 @@ class kubernetes::master::scheduler (
       }
 
       file { '/etc/kubernetes/scheduler':
-        ensure  => 'file',
+        ensure  => file,
         force   => true,
         owner   => 'root',
         group   => 'root',
         content => template("${module_name}/etc/kubernetes/scheduler.erb"),
         notify  => Service['kube-scheduler'],
+      }
+
+      if $log_dir {
+        file { $log_dir:
+          ensure => directory,
+          owner  => $owner,
+          group  => $group,
+          mode   => '0750',
+        } ~> Service['kube-scheduler']
       }
 
       service { 'kube-scheduler':
@@ -212,7 +226,7 @@ class kubernetes::master::scheduler (
 
       if $journald_forward_enable and $::operatingsystemmajrelease == '7' {
         file { '/etc/systemd/system/kube-scheduler.service.d':
-          ensure => 'directory',
+          ensure => directory,
           owner  => 'root',
           group  => 'root',
           mode   => '0755',

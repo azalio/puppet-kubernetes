@@ -19,12 +19,13 @@ class kubernetes::node (
   validate_string($ensure)
 
   include ::kubernetes::client
+  include kubernetes::node::docker
 
   if $manage_package {
     # this should ensure also that all files from /etc/kubernetes are managed after package install
-    package { ['kubernetes-node']: ensure => $ensure, } ->
-    File['/etc/kubernetes/'] ->
-    file { '/var/run/kubernetes/':
+    package { ['kubernetes-node']: ensure => $ensure, }
+    -> File['/etc/kubernetes/']
+    -> file { '/var/run/kubernetes/':
       ensure => directory,
       owner  => 'kube',
     }

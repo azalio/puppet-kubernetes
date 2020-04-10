@@ -12,7 +12,7 @@ KUBELET_HOSTNAME="--hostname-override=<%= scope['kubernetes::node::kubelet::host
 
 # location of the api-server
 <% if @api_servers -%>
-KUBELET_API_SERVER="--api-servers=<%= Array(scope['kubernetes::node::kubelet::api_servers']).join(',') %>" 
+KUBELET_API_SERVER="--api-servers=<%= Array(scope['kubernetes::node::kubelet::api_servers']).join(',') %>"
 <% end -%>
 
 # Add your own!
@@ -217,6 +217,15 @@ KUBELET_ARGS="<% -%>
 <% end -%>
 <% if @low_diskspace_threshold_mb -%>
  --low-diskspace-threshold-mb=<%= scope['kubernetes::node::kubelet::low_diskspace_threshold_mb'] -%>
+<% end -%>
+<% if @log_dir -%>
+ --log-dir=<%= @log_dir -%>
+<% end -%>
+<% if @log_file -%>
+ --log-file=<%= @log_file -%>
+<% end -%>
+<% unless [nil, :undefined, :undef, ''].include?(scope.lookupvar('kubernetes::node::kubelet::logtostderr')) -%>
+ --logtostderr=<%= scope['kubernetes::node::kubelet::logtostderr'] -%>
 <% end -%>
 <% if @make_iptables_util_chains -%>
  --make-iptables-util-chains=<%= scope['kubernetes::node::kubelet::make_iptables_util_chains'] -%>

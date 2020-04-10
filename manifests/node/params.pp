@@ -123,6 +123,11 @@ class kubernetes::node::params {
   $kubelet_cni_bin_dir = '/opt/cni/bin'
   $kubelet_cni_conf_dir = '/etc/cni/net.d'
   $kubelet_network_plugin = undef
+  $kubelet_log_dir = undef
+  $kubelet_log_file = undef
+  $kubelet_logtostderr = true
+  $kubelet_owner = 'root'
+  $kubelet_group = 'root'
 
   # proxy options
   $kube_proxy_service_ensure = 'running'
@@ -160,4 +165,9 @@ class kubernetes::node::params {
   $kube_proxy_udp_timeout = undef
   $kube_proxy_verbosity = 2
   $kube_proxy_extra_args = ''
+  $kube_proxy_log_dir = undef
+  $kube_proxy_log_file = undef
+  $kube_proxy_logtostderr = true
+  $kube_proxy_owner = 'root'
+  $kube_proxy_group = 'root'
 }

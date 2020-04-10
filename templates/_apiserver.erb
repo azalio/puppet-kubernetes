@@ -140,10 +140,10 @@
  --kubelet-timeout=<%= scope['kubernetes::master::apiserver::kubelet_timeout'] -%>
  --kubernetes-service-node-port=<%= scope['kubernetes::master::apiserver::kubernetes_service_node_port'] -%>
 <% if @log_dir -%>
- --log-dir=<%= scope['kubernetes::master::apiserver::log_dir'] -%>
+ --log-dir=<%= @log_dir -%>
 <% end -%>
 <% if @log_file -%>
- --log-file=<%= scope['kubernetes::master::apiserver::log_file'] -%>
+ --log-file=<%= @log_file -%>
 <% end -%>
 <% unless [nil, :undefined, :undef, ''].include?(scope.lookupvar('kubernetes::master::apiserver::logtostderr')) -%>
  --logtostderr=<%= scope['kubernetes::master::apiserver::logtostderr'] -%>
@@ -235,6 +235,10 @@
 <% if @proxy_client_cert_file -%>
  --proxy-client-cert-file=<%= scope['kubernetes::master::apiserver::proxy_client_cert_file'] -%>
  --proxy-client-key-file=<%= scope['kubernetes::master::apiserver::proxy_client_key_file'] -%>
+<% end -%>
+<% if @use_log_dir -%>
+ --log-dir=<%= scope['kubernetes::master::apiserver::log_dir'] -%>
+ --logtostderr=<%= scope['kubernetes::master::apiserver::log_to_stderr'] -%>
 <% end -%>
  --v=<%= scope['kubernetes::master::apiserver::verbosity'] -%>
  <%= scope['kubernetes::master::apiserver::extra_args'] -%>

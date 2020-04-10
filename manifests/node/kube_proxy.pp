@@ -185,6 +185,9 @@ class kubernetes::node::kube_proxy (
   $kube_api_burst                    = $kubernetes::node::params::kube_proxy_kube_api_burst,
   $kube_api_content_type             = $kubernetes::node::params::kube_proxy_kube_api_content_type,
   $kube_api_qps                      = $kubernetes::node::params::kube_proxy_kube_api_qps,
+  $log_dir                           = $kubernetes::node::params::kube_proxy_log_dir,
+  $log_file                          = $kubernetes::node::params::kube_proxy_log_file,
+  $logtostderr                       = $kubernetes::node::params::kube_proxy_logtostderr,
   $config                            = $kubernetes::node::params::kube_proxy_config,
   $kubeconfig                        = $kubernetes::node::params::kube_proxy_kubeconfig,
   $masquerade_all                    = $kubernetes::node::params::kube_proxy_masquerade_all,
@@ -195,6 +198,8 @@ class kubernetes::node::kube_proxy (
   $udp_timeout                       = $kubernetes::node::params::kube_proxy_udp_timeout,
   $verbosity                         = $kubernetes::node::params::kube_proxy_verbosity,
   $extra_args                        = $kubernetes::node::params::kube_proxy_extra_args,
+  $owner                             = $kubernetes::node::params::kube_proxy_owner,
+  $group                             = $kubernetes::node::params::kube_proxy_group,
 ) inherits kubernetes::node::params {
   validate_re($ensure, '^(running|stopped)$')
   validate_bool($enable)
@@ -211,7 +216,7 @@ class kubernetes::node::kube_proxy (
         }
         'debian' : {
           file { '/etc/default/kube-proxy':
-            ensure  => 'file',
+            ensure  => file,
             force   => true,
             content => template("${module_name}/etc/default/proxy.erb"),
             notify  => Service['kube-proxy'],
@@ -223,9 +228,18 @@ class kubernetes::node::kube_proxy (
       }
 
       file { '/etc/kubernetes/proxy':
-        ensure  => 'file',
+        ensure  => file,
         content => template("${module_name}/etc/kubernetes/proxy.erb"),
         notify  => Service['kube-proxy'],
+      }
+
+      if $log_dir {
+        file { $log_dir:
+          ensure => directory,
+          owner  => $owner,
+          group  => $group,
+          mode   => '0750',
+        } ~> Service['kube-proxy']
       }
 
       service { 'kube-proxy':
@@ -235,7 +249,7 @@ class kubernetes::node::kube_proxy (
 
       if $journald_forward_enable and $::operatingsystemmajrelease == '7' {
         file { '/etc/systemd/system/kube-proxy.service.d':
-          ensure => 'directory',
+          ensure => directory,
           owner  => 'root',
           group  => 'root',
           mode   => '0755',
